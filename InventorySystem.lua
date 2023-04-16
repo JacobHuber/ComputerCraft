@@ -155,7 +155,7 @@ function listItems(search)
     end
   end
 
-  modem.transmit(port, port, sortedItems)
+  enderModem.transmit(port, port, sortedItems)
 end
 
 local allFunctions = {
