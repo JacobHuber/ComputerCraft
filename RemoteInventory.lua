@@ -20,12 +20,10 @@ local cols = {
 
 function storeThirdRow()
   modem.transmit(port, 0, "storeThirdRow")
-  print("Store third row")
 end
 
 function listItems()
   modem.transmit(port, 0, "listItems")
-  print("List items")
 end
 
 local options = {
@@ -66,15 +64,11 @@ end
 
 function handleMouseClick()
   local mouse = { os.pullEvent("mouse_click") }
-  pretty.pretty_print(mouse)
   local n = table.getn(options)
   for i = 1, n, 1 do
     local option = options[i]
-    pretty.pretty_print(option)
-    if (mouse.y == option.y) then
-      print("Same y")
-      if mouse.x >= option.x and mouse.x < option.x + #option.text then
-        print("X inside")
+    if (mouse[3] == option.y) then
+      if mouse[4] >= option.x and mouse[4] < option.x + #option.text then
         option.callback()
       end
     end
