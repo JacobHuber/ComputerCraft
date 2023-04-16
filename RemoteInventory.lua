@@ -25,10 +25,15 @@ end
 function listItems()
   modem.open(port)
   modem.transmit(port, port, "listItems")
-  local message = { os.pull_event("modem_message") }
+  local message = { os.pullEvent("modem_message") }
   local payload = message[5]
 
-  textutils.pagedTabulate(payload)
+  local displayTable = {}
+  for name, count in pairs(payload) do
+    table.insert(displayTable, {name, count})
+  end
+
+  textutils.pagedTabulate(colors.orange, {"Name", "Count"}, colors.blue, table.unpack(displayTable))
 end
 
 local options = {
