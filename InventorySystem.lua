@@ -147,12 +147,15 @@ function listItems(search)
   monitor.clear()
   monitor.setCursorPos(1,1)
 
+  local sortedItems = {}
+
   for name, count in pairs(allItems) do
     if (string.find(string.lower(name), string.lower(search)) ~= nil) then 
-      writeToDisplay(count .. " ", colors.red)
-      writeToDisplay(name .. ", ", colors.black)
+      sortedItems[name] = count
     end
   end
+
+  modem.transmit(port, port, sortedItems)
 end
 
 local allFunctions = {

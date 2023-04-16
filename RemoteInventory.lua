@@ -23,7 +23,12 @@ function storeThirdRow()
 end
 
 function listItems()
-  modem.transmit(port, 0, "listItems")
+  modem.open(port)
+  modem.transmit(port, port, "listItems")
+  local message = { os.pull_event("modem_message") }
+  local payload = message[5]
+
+  textutils.pagedTabulate(payload)
 end
 
 local options = {
