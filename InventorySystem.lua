@@ -81,7 +81,10 @@ end
 local pretty = require "cc.pretty"
 writeToDisplay("Found " .. chestN .. " remote chest(s)", colors.black)
 
-enderModem.open(4197)
+local port = tonumber(arg[1])
+if (port == nil) then error("No port specified") end
+
+enderModem.open(port)
 
 function getEmptyChest()
   for i = 1, chestN, 1 do
