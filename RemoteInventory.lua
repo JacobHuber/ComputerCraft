@@ -28,12 +28,15 @@ function listItems()
   local message = { os.pullEvent("modem_message") }
   local payload = message[5]
 
-  local displayTable = {}
+  local outputString = ""
   for name, count in pairs(payload) do
-    table.insert(displayTable, {name, count})
+    outputString = outputString .. name .. "  " .. count .. "\n"
   end
 
-  textutils.pagedTabulate(colors.orange, {"Name", "Count"}, colors.blue, table.unpack(displayTable))
+  local width, height = term.getCursorPos()
+  textutils.pagedPrint(outputString, height - 2)
+  drawMenus()
+  --textutils.pagedTabulate(colors.orange, {"Name", "Count"}, colors.blue, table.unpack(displayTable))
 end
 
 local options = {
@@ -77,8 +80,8 @@ function handleMouseClick()
   local n = table.getn(options)
   for i = 1, n, 1 do
     local option = options[i]
-    if (mouse[3] == option.y) then
-      if mouse[4] >= option.x and mouse[4] < option.x + #option.text then
+    if (mouse[4] == option.y) then
+      if mouse[3] >= option.x and mouse[3] < option.x + #option.text then
         option.callback()
       end
     end
