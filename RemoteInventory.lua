@@ -30,11 +30,12 @@ function listItems()
 
   local outputString = ""
   for name, count in pairs(payload) do
-    outputString = outputString .. name .. "  " .. count .. "\n"
+    local length = width - #name - 3
+    outputString = outputString .. name .. string.rep(" ", length) .. count .. "\n"
   end
 
-  local width, height = term.getCursorPos()
-  textutils.pagedPrint(outputString, height - 2)
+  local x, y = term.getCursorPos()
+  textutils.pagedPrint(outputString, y - 2)
   drawMenus()
   --textutils.pagedTabulate(colors.orange, {"Name", "Count"}, colors.blue, table.unpack(displayTable))
 end
