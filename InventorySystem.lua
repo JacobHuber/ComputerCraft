@@ -259,10 +259,12 @@ while true do
   local command
   local arg
   if (i == nil) then
+    writeToDisplay(msg[5], colors.black)
     allFunctions[msg[5]]()
   else
     local command = string.sub(msg[5], 1, i - 1)
     local arg = string.sub(msg[5], i + 1, -1)
+    writeToDisplay(command, colors.black)
     allFunctions[command](arg)
   end
 end
