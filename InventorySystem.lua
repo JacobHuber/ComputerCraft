@@ -140,43 +140,57 @@ function getAllItems()
   return allItems
 end
 
-function swapItems(chest, slot1, slot2)
-  local name = peripheral.getName(chest)
-  invChest.pullItems(name, slot1, 999, 1)
-  chest.pushItems(name, slot2, 999, slot1)
-  invChest.pushItems(name, 1, 999, slot2)
+function swapItems(fromChestI, toChestI, fromSlot, toSlot)
+  local fromChest = remoteChests[fromChestI]
+  local toChest = remoteChests[toChestI]
+  local fromName = peripheral.getName(fromChest)
+  local toName = peripheral.getName(toChest)
+  
+  invChest.pullItems(toChest, toSlot, 999, 1)
+  toChest.pushItems(fromName, fromSlot, 999, toSlot)
+  invChest.pushItems(fromName, 1, 999, fromSlot)
 end
 
 function sortAllChests()
+  local allItems = {}
+  local sortedItems = {}
+
   for i = 1, chestN, 1 do
-    local allItems = {}
-    local sortedItems = {}
     local chest = remoteChests[i]
     local chestItems = chest.list()
+
+    allItems[i] = {}
+
     for slot, item in pairs(chestItems) do
       item.slot = slot
-      allItems[slot] = item
+      item.chest = i
+      allItems[chestName][slot] = item
       table.insert(sortedItems, item)
     end
+  end
 
-    table.sort(sortedItems, function(itemA, itemB) return itemA.name > itemB.name end)
+  table.sort(sortedItems, function(itemA, itemB) return itemA.name > itemB.name end)
 
-    for toSlot, item in pairs(sortedItems) do
-      local swappedItem = allItems[toSlot]
-      local fromSlot = item.slot
-      if (swappedItem == nil) then
-        chest.pushItems(peripheral.getName(chest), fromSlot, 999, toSlot)
-        allItems[toSlot] = item
-        allItems[fromSlot] = nil
-      else
-        swapItems(chest, toSlot, fromSlot)
-        allItems[fromSlot] = swappedItem
-        allItems[toSlot] = item
-        swappedItem.slot = fromSlot
-      end
-      
-      item.slot = toSlot
+  for sortedIndex, item in pairs(sortedItems) do
+    local toSlot = ((sortedIndex - 1) % 54) + 1
+    local chestIndex = math.floor((sortedIndex - 1) / 54) + 1
+    local swappedItem = allItems[chestIndex][toSlot]
+    local fromSlot = item.slot
+
+    if (swappedItem == nil) then
+      remoteChests[chestIndex].pushItems(peripheral.getName(remoteChests[item.chest]), fromSlot, 999, toSlot)
+      allItems[chestIndex][toSlot] = item
+      allItems[item.chest][fromSlot] = nil
+    else
+      swapItems(item.chest, chestIndex, toSlot, fromSlot)
+      allItems[item.chest][fromSlot] = swappedItem
+      allItems[chestIndex][toSlot] = item
+      swappedItem.slot = fromSlot
+      swappedItem.chest = item.chest
     end
+    
+    item.chest = chestIndex
+    item.slot = toSlot
   end
 
   enderModem.transmit(port, port, "Done")
