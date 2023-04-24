@@ -176,46 +176,53 @@ function sortAllChests()
     local toChest = math.floor((indexCount - 1) / 54) + 1
     local toSlot = ((indexCount - 1) % 54) + 1
 
-    local shouldSkip = false
-    if (prevItem ~= nil) then
-      if (prevItem.name == item.name) then
-        local count = prevItem.count
-        local limit = remoteChests[prevItem.chest].getItemLimit(prevItem.slot)
+    local alreadySorted = false
+    if (item.chest == toChest and item.slot == toSlot) then
+      alreadySorted = true
+    end
 
-        if (count < limit) then
-          local remaining = limit - count
-          remoteChests[prevItem.chest].pullItems(peripheral.getName(remoteChests[fromChest]), fromSlot, remaining, prevItem.slot)
-          
-          if (remaining >= item.count) then
-            allItems[fromChest][fromSlot] = nil
-            prevItem.count = prevItem.count + item.count
-            shouldSkip = true
-          else
-            item.count = item.count - remaining
-            prevItem.count = limit
+    if (not alreadySorted) then
+      local shouldSkip = false
+      if (prevItem ~= nil) then
+        if (prevItem.name == item.name) then
+          local count = prevItem.count
+          local limit = remoteChests[prevItem.chest].getItemLimit(prevItem.slot)
+
+          if (count < limit) then
+            local remaining = limit - count
+            remoteChests[prevItem.chest].pullItems(peripheral.getName(remoteChests[fromChest]), fromSlot, remaining, prevItem.slot)
+            
+            if (remaining >= item.count) then
+              allItems[fromChest][fromSlot] = nil
+              prevItem.count = prevItem.count + item.count
+              shouldSkip = true
+            else
+              item.count = item.count - remaining
+              prevItem.count = limit
+            end
           end
         end
       end
-    end
 
-    if (not shouldSkip) then
-      local swappedItem = allItems[toChest][toSlot]
+      if (not shouldSkip) then
+        local swappedItem = allItems[toChest][toSlot]
 
-      if (swappedItem == nil) then
-        remoteChests[toChest].pullItems(peripheral.getName(remoteChests[fromChest]), fromSlot, 999, toSlot)
-        allItems[fromChest][fromSlot] = nil
-        allItems[toChest][toSlot] = item
-      else
-        swapItems(fromChest, toChest, fromSlot, toSlot)
-        allItems[fromChest][fromSlot] = swappedItem
-        allItems[toChest][toSlot] = item
-        swappedItem.chest = fromChest
-        swappedItem.slot = fromSlot
+        if (swappedItem == nil) then
+          remoteChests[toChest].pullItems(peripheral.getName(remoteChests[fromChest]), fromSlot, 999, toSlot)
+          allItems[fromChest][fromSlot] = nil
+          allItems[toChest][toSlot] = item
+        else
+          swapItems(fromChest, toChest, fromSlot, toSlot)
+          allItems[fromChest][fromSlot] = swappedItem
+          allItems[toChest][toSlot] = item
+          swappedItem.chest = fromChest
+          swappedItem.slot = fromSlot
+        end
+        
+        item.chest = toChest
+        item.slot = toSlot
       end
       
-      item.chest = toChest
-      item.slot = toSlot
-
       prevItem = item
       indexCount = indexCount + 1
     end
