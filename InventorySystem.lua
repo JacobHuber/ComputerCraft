@@ -222,10 +222,10 @@ function sortAllChests()
         item.chest = toChest
         item.slot = toSlot
       end
-      
-      prevItem = item
-      indexCount = indexCount + 1
     end
+      
+    prevItem = item
+    indexCount = indexCount + 1    
   end
 
   enderModem.transmit(port, port, "Done")
