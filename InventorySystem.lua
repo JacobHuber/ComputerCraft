@@ -171,27 +171,57 @@ function sortAllChests()
 
   table.sort(sortedItems, function(itemA, itemB) return itemA.name < itemB.name end)
 
+  local prevItem = nil
+  local indexCount = 1
   for sortedIndex, item in pairs(sortedItems) do
     local fromChest = item.chest
     local fromSlot = item.slot
-    local toChest = math.floor((sortedIndex - 1) / 54) + 1
-    local toSlot = ((sortedIndex - 1) % 54) + 1
-    local swappedItem = allItems[toChest][toSlot]
+    local toChest = math.floor((indexCount - 1) / 54) + 1
+    local toSlot = ((indexCount - 1) % 54) + 1
 
-    if (swappedItem == nil) then
-      remoteChests[toChest].pullItems(peripheral.getName(remoteChests[fromChest]), fromSlot, 999, toSlot)
-      allItems[fromChest][fromSlot] = nil
-      allItems[toChest][toSlot] = item
-    else
-      swapItems(fromChest, toChest, fromSlot, toSlot)
-      allItems[fromChest][fromSlot] = swappedItem
-      allItems[toChest][toSlot] = item
-      swappedItem.chest = fromChest
-      swappedItem.slot = fromSlot
+    local shouldSkip = false
+    if (prevItem ~= nil) then
+      if (prevItem.name == item.name) then
+        local count = prevItem.count
+        local limit = remoteChests[prevItem.chest].getItemLimit(prevItem.slot)
+
+        if (count < limit) then
+          local remaining = limit - count
+          remoteChests[prevItem.chest].pullItems(peripheral.getName(remoteChests[fromChest]), fromSlot, remaining, prevItem.slot)
+          
+          if (remaining >= item.count) then
+            allItems[fromChest][fromSlot] = nil
+            prevItem.count = prevItem.count + item.count
+            shouldSkip = true
+          else
+            item.count = item.count - remaining
+            prevItem.count = limit
+          end
+        end
+      end
     end
-    
-    item.chest = toChest
-    item.slot = toSlot
+
+    if (not shouldSkip) then
+      local swappedItem = allItems[toChest][toSlot]
+
+      if (swappedItem == nil) then
+        remoteChests[toChest].pullItems(peripheral.getName(remoteChests[fromChest]), fromSlot, 999, toSlot)
+        allItems[fromChest][fromSlot] = nil
+        allItems[toChest][toSlot] = item
+      else
+        swapItems(fromChest, toChest, fromSlot, toSlot)
+        allItems[fromChest][fromSlot] = swappedItem
+        allItems[toChest][toSlot] = item
+        swappedItem.chest = fromChest
+        swappedItem.slot = fromSlot
+      end
+      
+      item.chest = toChest
+      item.slot = toSlot
+
+      prevItem = item
+      indexCount = indexCount + 1
+    end
   end
 
   enderModem.transmit(port, port, "Done")
