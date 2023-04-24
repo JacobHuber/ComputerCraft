@@ -40,10 +40,10 @@ function listItems()
     outputString = outputString .. name .. string.rep(" ", length) .. count .. "\n"
   end
 
-  local x, y = term.getCursorPos()
-  textutils.pagedPrint(outputString, y - 2)
+  term.clear()
+  term.setCursorPos(1,2)
+  textutils.pagedPrint(outputString, 0)
   drawMenus()
-  --textutils.pagedTabulate(colors.orange, {"Name", "Count"}, colors.blue, table.unpack(displayTable))
 end
 
 function sortAllChests()
