@@ -7,11 +7,8 @@ monitor.setTextScale(0.5)
 local width, height = monitor.getSize()
 
 function writeToDisplay(text, col)
-  local len = #text
   local x, y = monitor.getCursorPos()
-  if (x + len > width) then
-    monitor.setCursorPos(1, y + 1)
-  end
+  monitor.setCursorPos(1, y + 1)
   if (y > height) then
     monitor.setCursorPos(1, y - 1)
     monitor.scroll(1)
@@ -231,9 +228,6 @@ function listItems(search)
   if (search == nil) then search = "" end
   local allItems = getAllItems()
 
-  monitor.clear()
-  monitor.setCursorPos(1,1)
-
   local sortedItems = {}
 
   for name, count in pairs(allItems) do
@@ -258,13 +252,12 @@ while true do
   local i = string.find(msg[5], " ")
   local command
   local arg
+  writeToDisplay(msg[5], colors.black)
   if (i == nil) then
-    writeToDisplay(msg[5], colors.black)
     allFunctions[msg[5]]()
   else
     local command = string.sub(msg[5], 1, i - 1)
     local arg = string.sub(msg[5], i + 1, -1)
-    writeToDisplay(command, colors.black)
     allFunctions[command](arg)
   end
 end
