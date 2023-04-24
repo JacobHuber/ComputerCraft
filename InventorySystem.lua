@@ -169,7 +169,7 @@ function sortAllChests()
     end
   end
 
-  table.sort(sortedItems, function(itemA, itemB) return itemA.name > itemB.name end)
+  table.sort(sortedItems, function(itemA, itemB) return itemA.name < itemB.name end)
 
   for sortedIndex, item in pairs(sortedItems) do
     local fromChest = item.chest
@@ -179,7 +179,7 @@ function sortAllChests()
     local swappedItem = allItems[toChest][toSlot]
 
     if (swappedItem == nil) then
-      remoteChests[toChest].pushItems(peripheral.getName(remoteChests[fromChest]), fromSlot, 999, toSlot)
+      remoteChests[toChest].pullItems(peripheral.getName(remoteChests[fromChest]), fromSlot, 999, toSlot)
       allItems[fromChest][fromSlot] = nil
       allItems[toChest][toSlot] = item
     else
