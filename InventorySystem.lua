@@ -178,6 +178,8 @@ function sortAllChests()
       item.slot = toSlot
     end
   end
+
+  enderModem.transmit(port, port, "Done")
 end
 
 function listItems(search)

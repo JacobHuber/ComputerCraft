@@ -12,6 +12,12 @@ if (port == nil) then error("No port supplied") end
 
 local width, height = term.getSize()
 
+function writeText(x, y, text)
+  term.setCursorPos(x, y)
+  local len = #text
+  term.blit(text, string.rep("0", len), string.rep("2", len))   
+end
+
 local cols = {
   ["bg"] = colors.purple,
   ["text"] = colors.white,
@@ -41,7 +47,14 @@ function listItems()
 end
 
 function sortAllChests()
+  modem.open(port)
   modem.transmit(port, 0, "sortAllChests")
+
+  term.clear()
+  writeText(1, 1, "Sorting. Please wait...")
+  local message = { os.pullEvent("modem_message") }
+  local payload = message[5]
+  drawMenus()
 end
 
 local options = {
@@ -79,10 +92,7 @@ function drawMenus()
   local n = table.getn(options)
   for i = 1, n, 1 do
     local option = options[i]
-    term.setCursorPos(option.x, option.y)
-    local text = option.text
-    local len = #text
-    term.blit(text, string.rep("0", len), string.rep("2", len))   
+    writeText(option.x, option.y, option.text)
   end
 end
 
