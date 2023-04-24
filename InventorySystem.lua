@@ -146,9 +146,9 @@ function swapItems(fromChestI, toChestI, fromSlot, toSlot)
   local fromName = peripheral.getName(fromChest)
   local toName = peripheral.getName(toChest)
   
-  invChest.pullItems(toChest, toSlot, 999, 1)
-  toChest.pushItems(fromName, fromSlot, 999, toSlot)
-  invChest.pushItems(fromName, 1, 999, fromSlot)
+  invChest.pullItems(toName, toSlot, 999, 1) -- move from toChest to invChest
+  toChest.pullItems(fromName, fromSlot, 999, toSlot) -- move from fromChest to toChest
+  invChest.pushItems(fromName, 1, 999, fromSlot) -- move from invChest to fromChest
 end
 
 function sortAllChests()
@@ -164,7 +164,7 @@ function sortAllChests()
     for slot, item in pairs(chestItems) do
       item.slot = slot
       item.chest = i
-      allItems[chestName][slot] = item
+      allItems[i][slot] = item
       table.insert(sortedItems, item)
     end
   end
@@ -172,24 +172,25 @@ function sortAllChests()
   table.sort(sortedItems, function(itemA, itemB) return itemA.name > itemB.name end)
 
   for sortedIndex, item in pairs(sortedItems) do
-    local toSlot = ((sortedIndex - 1) % 54) + 1
-    local chestIndex = math.floor((sortedIndex - 1) / 54) + 1
-    local swappedItem = allItems[chestIndex][toSlot]
+    local fromChest = item.chest
     local fromSlot = item.slot
+    local toChest = math.floor((sortedIndex - 1) / 54) + 1
+    local toSlot = ((sortedIndex - 1) % 54) + 1
+    local swappedItem = allItems[toChest][toSlot]
 
     if (swappedItem == nil) then
-      remoteChests[chestIndex].pushItems(peripheral.getName(remoteChests[item.chest]), fromSlot, 999, toSlot)
-      allItems[chestIndex][toSlot] = item
-      allItems[item.chest][fromSlot] = nil
+      remoteChests[toChest].pushItems(peripheral.getName(remoteChests[fromChest]), fromSlot, 999, toSlot)
+      allItems[fromChest][fromSlot] = nil
+      allItems[toChest][toSlot] = item
     else
-      swapItems(item.chest, chestIndex, toSlot, fromSlot)
-      allItems[item.chest][fromSlot] = swappedItem
-      allItems[chestIndex][toSlot] = item
+      swapItems(fromChest, toChest, fromSlot, toSlot)
+      allItems[fromChest][fromSlot] = swappedItem
+      allItems[toChest][toSlot] = item
+      swappedItem.chest = fromChest
       swappedItem.slot = fromSlot
-      swappedItem.chest = item.chest
     end
     
-    item.chest = chestIndex
+    item.chest = toChest
     item.slot = toSlot
   end
 
