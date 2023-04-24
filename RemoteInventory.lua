@@ -40,6 +40,10 @@ function listItems()
   --textutils.pagedTabulate(colors.orange, {"Name", "Count"}, colors.blue, table.unpack(displayTable))
 end
 
+function sortAllChests()
+  modem.transmit(port, 0, "sortAllChests")
+end
+
 local options = {
   {
     ["x"] = 1,
@@ -52,6 +56,12 @@ local options = {
     ["y"] = 3,
     ["text"] = "List Items",
     ["callback"] = listItems
+  },
+  {
+    ["x"] = 1,
+    ["y"] = 5,
+    ["text"] = "Sort All Chests",
+    ["callback"] = sortAllChests
   }
 }
 

@@ -196,7 +196,8 @@ end
 
 local allFunctions = {
   ["storeThirdRow"] = storeThirdRow,
-  ["listItems"] = listItems
+  ["listItems"] = listItems,
+  ["sortAllChests"] = sortAllChests
 }
 
 -- Modem exists, and is wireless!
