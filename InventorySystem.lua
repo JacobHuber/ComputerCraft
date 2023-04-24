@@ -161,13 +161,17 @@ function sortAllChests()
 
     table.sort(sortedItems, function(itemA, itemB) return itemA.name > itemB.name end)
 
-    for toSlot, item in pairs(sortedItems)
+    for toSlot, item in pairs(sortedItems) do
       local swappedItem = allItems[toSlot]
       local fromSlot = item.slot
       if (swappedItem == nil) then
-        chest.pushItems(peripheral.getName(chest), fromSlot, 999, toSlot)  
+        chest.pushItems(peripheral.getName(chest), fromSlot, 999, toSlot)
+        allItems[toSlot] = item
+        allItems[fromSlot] = nil
       else
         swapItems(chest, toSlot, fromSlot)
+        allItems[fromSlot] = swappedItem
+        allItems[toSlot] = item
         swappedItem.slot = fromSlot
       end
       
