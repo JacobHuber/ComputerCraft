@@ -140,6 +140,42 @@ function getAllItems()
   return allItems
 end
 
+function swapItems(chest, slot1, slot2)
+  local name = peripheral.getName(chest)
+  invChest.pullItems(name, slot1, 999, 1)
+  chest.pushItems(name, slot2, 999, slot1)
+  invChest.pushItems(name, 1, 999, slot2)
+end
+
+function sortAllChests()
+  for i = 1, chestN, 1 do
+    local allItems = {}
+    local sortedItems = {}
+    local chest = remoteChests[i]
+    local chestItems = chest.list()
+    for slot, item in pairs(chestItems) do
+      item.slot = slot
+      allItems[slot] = item
+      table.insert(sortedItems, item)
+    end
+
+    table.sort(sortedItems, function(itemA, itemB) return itemA.name > itemB.name end)
+
+    for toSlot, item in pairs(sortedItems)
+      local swappedItem = allItems[toSlot]
+      local fromSlot = item.slot
+      if (swappedItem == nil) then
+        chest.pushItems(peripheral.getName(chest), fromSlot, 999, toSlot)  
+      else
+        swapItems(chest, toSlot, fromSlot)
+        swappedItem.slot = fromSlot
+      end
+      
+      item.slot = toSlot
+    end
+  end
+end
+
 function listItems(search)
   if (search == nil) then search = "" end
   local allItems = getAllItems()
